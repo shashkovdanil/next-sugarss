@@ -78,19 +78,7 @@ module.exports = (
       loader: 'postcss-loader',
       options: Object.assign({}, postcssLoaderOptions, {
         parser: 'sugarss',
-        config: Object.assign(postcssOptionsConfig, {
-          ctx: {
-            'postcss-preset-env': {
-              browsers: 'defaults'
-            },
-            'postcss-easy-import': {
-              extensions: ['.sss']
-            },
-            'postcss-nested': {},
-            precss: {},
-            cssnano: {}
-          }
-        })
+        config: postcssOptionsConfig
       })
     }
   }
