@@ -1,3 +1,6 @@
+const loaderUtils = require('loader-utils')
+const normalizePath = require('normalize-path')
+const path = require('path')
 const cssLoaderConfig = require('./css-loader-config')
 
 module.exports = (nextConfig = {}) => {
@@ -12,13 +15,46 @@ module.exports = (nextConfig = {}) => {
       const { dev, isServer } = options
       const { cssModules, cssLoaderOptions, postcssLoaderOptions } = nextConfig
 
+      function getLocalIdentExcludeWebp(
+        loaderContext,
+        localIdentName,
+        localName,
+        options
+      ) {
+        // For webp-in-css https://github.com/ai/webp-in-css
+        if (localName.includes('webp')) return localName
+
+        if (!options.context) options.context = loaderContext.rootContext
+
+        const request = normalizePath(
+          path.relative(options.context || '', loaderContext.resourcePath)
+        )
+        options.content = `${options.hashPrefix + request}+${unescape(
+          localName
+        )}`
+        localIdentName = localIdentName.replace(/\[local\]/gi, localName)
+        const hash = loaderUtils.interpolateName(
+          loaderContext,
+          localIdentName,
+          options
+        )
+
+        return hash
+          .replace(new RegExp('[^a-zA-Z0-9\\-_\u00A0-\uFFFF]', 'g'), '-')
+          .replace(/^((-?[0-9])|--)/, '_$1')
+      }
+
       options.defaultLoaders.css = cssLoaderConfig(config, {
         extensions: ['css', 'sss'],
         cssModules,
-        cssLoaderOptions,
+        cssLoaderOptions: {
+          ...cssLoaderOptions,
+          getLocalIdent:
+            cssLoaderOptions.getLocalIdent || getLocalIdentExcludeWebp,
+        },
         postcssLoaderOptions,
         dev,
-        isServer
+        isServer,
       })
 
       config.module.rules.push({
@@ -31,7 +67,7 @@ module.exports = (nextConfig = {}) => {
           }
           return true
         },
-        use: options.defaultLoaders.css
+        use: options.defaultLoaders.css,
       })
 
       if (typeof nextConfig.webpack === 'function') {
@@ -39,6 +75,6 @@ module.exports = (nextConfig = {}) => {
       }
 
       return config
-    }
+    },
   })
 }

@@ -1,6 +1,6 @@
 {
   "name": "next-sugarss",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "main": "index.js",
   "license": "MIT",
   "repository": "shashkovdanil/next-sugarss",
@@ -14,6 +14,45 @@
     "postcss-loader": "3.0.0"
   },
   "devDependencies": {
+    "babel-eslint": "^10.0.1",
+    "eslint": "^5.16.0",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-config-prettier": "^4.1.0",
+    "eslint-import-resolver-node": "^0.3.2",
+    "eslint-plugin-import": "^2.16.0",
+    "eslint-plugin-node": "^8.0.1",
+    "eslint-plugin-prettier": "^3.0.1",
+    "eslint-plugin-promise": "^4.1.1",
+    "prettier": "^1.16.4",
     "webpack": "^4.16.3"
+  },
+  "eslintConfig": {
+    "parser": "babel-eslint",
+    "extends": [
+      "airbnb-base",
+      "prettier"
+    ],
+    "plugins": [
+      "prettier"
+    ],
+    "rules": {
+      "no-return-await": "off",
+      "no-shadow": "off",
+      "no-param-reassign": "off",
+      "import/no-mutable-exports": "off",
+      "consistent-return": "off",
+      "dot-notation": "off",
+      "import/no-extraneous-dependencies": "off",
+      "import/prefer-default-export": "off"
+    }
+  },
+  "prettier": {
+    "printWidth": 80,
+    "tabWidth": 2,
+    "semi": false,
+    "singleQuote": true,
+    "trailingComma": "es5",
+    "bracketSpacing": true,
+    "parser": "babel"
   }
 }
