@@ -50,7 +50,7 @@ __Note: CSS files can _not_ be imported into your [`_document.js`](https://githu
 
 ```js
 // next.config.js
-const withCSS = require('next-sugarss')
+const withSugarSS = require('next-sugarss')
 module.exports = withSugarSS({
   cssModules: true
 })
@@ -79,7 +79,7 @@ For instance, [to enable locally scoped CSS modules](https://github.com/css-modu
 
 ```js
 // next.config.js
-const withCSS = require('next-sugarss')
+const withSugarSS = require('next-sugarss')
 module.exports = withSugarSS({
   cssModules: true,
   cssLoaderOptions: {
@@ -177,7 +177,7 @@ Optionally you can add your custom Next.js configuration as parameter
 
 ```js
 // next.config.js
-const withCSS = require('next-sugarss')
+const withSugarSS = require('next-sugarss')
 module.exports = withSugarSS({
   webpack(config, options) {
     return config
