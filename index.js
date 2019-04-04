@@ -1,16 +1,16 @@
-const cssLoaderConfig = require('./sss-loader-config')
+const cssLoaderConfig = require('./css-loader-config')
 
 module.exports = (nextConfig = {}) => {
   return Object.assign({}, nextConfig, {
-    webpack (config, options) {
+    webpack(config, options) {
       if (!options.defaultLoaders) {
         throw new Error(
           'This plugin is not compatible with Next.js versions below 5.0.0 https://err.sh/next-plugins/upgrade'
         )
       }
 
-      let { dev, isServer } = options
-      let { cssModules, cssLoaderOptions, postcssLoaderOptions } = nextConfig
+      const { dev, isServer } = options
+      const { cssModules, cssLoaderOptions, postcssLoaderOptions } = nextConfig
 
       options.defaultLoaders.css = cssLoaderConfig(config, {
         extensions: ['css', 'sss'],
@@ -23,7 +23,7 @@ module.exports = (nextConfig = {}) => {
 
       config.module.rules.push({
         test: /\.(c|s)ss$/,
-        issuer (issuer) {
+        issuer(issuer) {
           if (issuer.match(/pages[\\/]_document\.js$/)) {
             throw new Error(
               'You can not import CSS files in pages/_document.js, use pages/_app.js instead.'

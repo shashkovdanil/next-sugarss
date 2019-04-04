@@ -1,6 +1,5 @@
 const ExtractCssChunks = require('extract-css-chunks-webpack-plugin')
 const findUp = require('find-up')
-const OptimizeCssAssetsWebpackPlugin = require('optimize-css-assets-webpack-plugin')
 
 const fileExtensions = new Set()
 let extractCssInitialized = false
@@ -18,14 +17,14 @@ module.exports = (
   }
 ) => {
   // We have to keep a list of extensions for the splitchunk config
-  for (let extension of extensions) {
+  for (const extension of extensions) {
     fileExtensions.add(extension)
   }
 
   if (!isServer) {
     config.optimization.splitChunks.cacheGroups.styles = {
       name: 'styles',
-      test: new RegExp(`\\.+(${[...fileExtensions].join('|')})$`), // eslint-disable-line
+      test: new RegExp(`\\.+(${[...fileExtensions].join('|')})$`),
       chunks: 'all',
       enforce: true
     }
@@ -42,8 +41,8 @@ module.exports = (
         chunkFilename: dev
           ? 'static/chunks/[name].chunk.css'
           : 'static/chunks/[name].[contenthash:8].chunk.css',
-        hot: dev,
-        reloadAll: dev
+        orderWarning: false,
+        reloadAll: true
       })
     )
     extractCssInitialized = true
@@ -53,45 +52,39 @@ module.exports = (
     if (!Array.isArray(config.optimization.minimizer)) {
       config.optimization.minimizer = []
     }
-
-    config.optimization.minimizer.push(
-      new OptimizeCssAssetsWebpackPlugin({
-        cssProcessorOptions: {
-          discardComments: { removeAll: true }
-        }
-      })
-    )
+    const OptimizeCssAssetsWebpackPlugin = require('optimize-css-assets-webpack-plugin');
+    config.optimization.minimizer.push(new OptimizeCssAssetsWebpackPlugin({}))
   }
 
-  let postcssConfigPath = findUp.sync('postcss.config.js', {
+  const postcssConfig = findUp.sync('postcss.config.js', {
     cwd: config.context
   })
   let postcssLoader
 
-  if (postcssConfigPath) {
+  if (postcssConfig) {
     // Copy the postcss-loader config options first.
-    let postcssOptionsConfig = Object.assign({}, postcssLoaderOptions.config, {
-      path: postcssConfigPath
-    })
+    const postcssOptionsConfig = Object.assign(
+      {},
+      postcssLoaderOptions.config,
+      { path: postcssConfig }
+    )
 
     postcssLoader = {
       loader: 'postcss-loader',
       options: Object.assign({}, postcssLoaderOptions, {
-        parser: 'sugarss',
         config: postcssOptionsConfig
       })
     }
   }
 
-  let cssLoader = {
-    loader: 'css-loader',
+  const cssLoader = {
+    loader: isServer ? 'css-loader/locals' : 'css-loader',
     options: Object.assign(
       {},
       {
         modules: cssModules,
         sourceMap: dev,
-        importLoaders: loaders.length + (postcssLoader ? 1 : 0),
-        exportOnlyLocals: isServer
+        importLoaders: loaders.length + (postcssLoader ? 1 : 0)
       },
       cssLoaderOptions
     )
@@ -108,7 +101,7 @@ module.exports = (
   }
 
   return [
-    dev && ExtractCssChunks.hotLoader,
+    !isServer && dev && 'extracted-loader',
     !isServer && ExtractCssChunks.loader,
     cssLoader,
     postcssLoader,
